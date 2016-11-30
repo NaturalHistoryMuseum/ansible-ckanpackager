@@ -1,0 +1,39 @@
+DEBUG = {{ckanpackager_debug}}
+HOST = '{{ckanpackager_host}}'
+PORT = "{{ckanpackager_port}}"
+SECRET = "{{ckanpackager_secret}}"
+STATS_DB = 'sqlite:////var/lib/ckanpackager/stats.db'
+CELERY_BROKER = 'redis://localhost:6379/0'
+STORE_DIRECTORY = "{{ckanpackager_store_directory}}"
+TEMP_DIRECTORY = "/tmp"
+CACHE_TIME = 60*60*24
+PAGE_SIZE = 5000
+SLOW_REQUEST = 10000
+ZIP_COMMAND = "/usr/bin/zip -j {output} {input}"
+SUCCESS_MESSAGE = "The resource will be emailed to you shortly. This make take a little longer if our servers are busy, so please be patient!"
+EMAIL_SUBJECT = "{{ckanpackager_email_subject}}"
+EMAIL_FROM = "{{ckanpackager_email_from}}"
+EMAIL_BODY = """Hello,
+The link to the resource you requested on {ckan_host} is available at:
+http://{SERVER_NAME}/resources/{zip_file_name}
+Best Wishes,
+The Data Portal Bot
+"""
+SMTP_HOST = '{{ckanpackager_smtp_host}}'
+SMTP_PORT = {{ckanpackager_smtp_port}}
+DWC_ID_FIELD = '_id'
+DWC_CORE_EXTENSION = '/etc/ckanpackager/gbif_dwca_extensions/core/dwc_occurrence.xml'
+DWC_DYNAMIC_TERM = 'dynamicProperties'
+DWC_EXTENSION_FIELDS = {
+    'associatedMedia': {
+        'extension': '/etc/ckanpackager/gbif_dwca_extensions/extensions/multimedia.xml',
+        'fields': {
+            'type': '',
+            'format': '',
+            'identifier': '',
+            'title': '',
+            'license': '',
+            'rightsHolder': ''
+        }
+    }
+}

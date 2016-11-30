@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec {{ckanpackager_dir}}/bin/celery -A ckanpackager.task_setup.app flower --logging=error --basic_auth={{ckanpackager_user}}:{{ckanpackager_password}}

@@ -1,0 +1,128 @@
+---
+  - name: Check secret and password
+    fail: msg="Variable '{{ item }}' is not defined"
+    when: item not in vars
+    with_items: 
+       - ckanpackager_secret
+       - ckanpackager_password
+
+  - name: Update apt
+    apt: update_cache=yes
+    become: yes
+    become_method: sudo
+    
+  - name: Install packages
+    apt: pkg={{ item }} state=installed
+    become: yes
+    become_method: sudo
+    with_items:
+      - apache2
+      - libapache2-mod-wsgi
+      - redis-server
+      - supervisor
+      - libxml2-dev
+      - libxslt1-dev
+      - libpq-dev
+      - build-essential
+      - git
+      - software-properties-common
+      - python-software-properties      
+      - language-pack-en
+      - apt-transport-https
+      - libnotify-bin
+      - python-httplib2
+      - python-dev
+      - python-pip 
+      - python-virtualenv      
+
+  - name: Enable apache2 wsgi
+    apache2_module: state=present name=wsgi
+    become: yes
+    become_method: sudo
+
+  - name: Install ckanpackager
+    pip: name='git+https://github.com/NaturalHistoryMuseum/ckanpackager.git#egg=ckanpackager' virtualenv={{ckanpackager_dir}}
+    become: yes
+    become_method: sudo
+
+  - set_fact: dir="{{ckanpackager_dir}}/src/ckanpackager" 
+
+  - name: Install ckanpackager
+    pip: requirements='{{dir}}/requirements.txt' virtualenv={{ckanpackager_dir}}
+    become: yes
+    become_method: sudo    
+
+  - name:  Copy redis config
+    copy: src=redis.conf dest=/etc/redis.conf
+    become: yes
+    become_method: sudo
+
+  - name:  Install Apache site
+    template: src=ckanpackager.conf.j2 dest=/etc/apache2/sites-available/ckanpackager.conf
+    become: yes
+    become_method: sudo
+    notify:
+      - restart apache2    
+
+  - name: Apache listen on port {{ckanpackager_port}}
+    lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen 80" line="Listen {{ckanpackager_port}}" state=present
+    become: yes
+    become_method: sudo     
+    notify:
+      - restart apache2
+
+  - name: Enable ckanpackager site
+    command: a2ensite ckanpackager
+    become: yes
+    become_method: sudo    
+    notify:
+    - restart apache2
+
+  - name: Create CKAN directory
+    file: path=/etc/ckan state=directory
+    become: yes
+    become_method: sudo
+
+  - name:  Install wsgi
+    copy: src=ckanpackager.wsgi dest=/etc/ckan/ckanpackager.wsgi
+    become: yes
+    become_method: sudo
+
+  - name:  Install DWC-A extensions
+    copy: src=gbif_dwca_extensions dest=/etc/ckanpackager/  
+    become: yes
+    become_method: sudo    
+
+  - name: Create database directory
+    file: path=/var/lib/ckanpackager state=directory owner=www-data group=www-data mode=0755
+    become: yes
+    become_method: sudo    
+
+  - name: Create ckanpackager directory
+    file: path=/etc/ckanpackager state=directory
+    become: yes
+    become_method: sudo
+
+  - name: Copy ckanpackager settings
+    template: src=ckanpackager_settings.py.j2 dest=/etc/ckanpackager/ckanpackager_settings.py
+    become: yes
+    become_method: sudo
+
+  - name: Install celery flower
+    template: src=celery_flower.sh.j2 dest=/usr/local/bin/celery_flower.sh mode=a+x
+    become: yes
+    become_method: sudo    
+
+  - name: Install ckanpacker cli
+    template: src=ckanpackager-cli.json.j2 dest=/etc/ckanpackager/ckanpackager-cli.json
+    become: yes
+    become_method: sudo
+
+  - name: Install supervisor
+    template: src=supervisord.conf.j2 dest=/etc/supervisor/conf.d/supervisord.conf
+    become: yes
+    become_method: sudo 
+    notify:
+    - restart supervisor
+
+
