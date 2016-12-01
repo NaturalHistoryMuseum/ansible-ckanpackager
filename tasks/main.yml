@@ -16,8 +16,6 @@
     become: yes
     become_method: sudo
     with_items:
-      - apache2
-      - libapache2-mod-wsgi
       - redis-server
       - supervisor
       - libxml2-dev
@@ -35,11 +33,6 @@
       - python-pip 
       - python-virtualenv      
 
-  - name: Enable apache2 wsgi
-    apache2_module: state=present name=wsgi
-    become: yes
-    become_method: sudo
-
   - name: Install ckanpackager
     pip: name='git+https://github.com/NaturalHistoryMuseum/ckanpackager.git#egg=ckanpackager' virtualenv={{ckanpackager_dir}}
     become: yes
@@ -47,7 +40,7 @@
 
   - set_fact: dir="{{ckanpackager_dir}}/src/ckanpackager" 
 
-  - name: Install ckanpackager
+  - name: Install ckanpackager requirements
     pip: requirements='{{dir}}/requirements.txt' virtualenv={{ckanpackager_dir}}
     become: yes
     become_method: sudo    
@@ -57,41 +50,10 @@
     become: yes
     become_method: sudo
 
-  - name:  Install Apache site
-    template: src=ckanpackager.conf.j2 dest=/etc/apache2/sites-available/ckanpackager.conf
-    become: yes
-    become_method: sudo
-    notify:
-      - restart apache2    
-
-  - name: Apache listen on port {{ckanpackager_port}}
-    lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen 80" line="Listen {{ckanpackager_port}}" state=present
-    become: yes
-    become_method: sudo     
-    notify:
-      - restart apache2
-
-  - name: Enable ckanpackager site
-    command: a2ensite ckanpackager
-    become: yes
-    become_method: sudo    
-    notify:
-    - restart apache2
-
-  - name: Create CKAN directory
-    file: path=/etc/ckan state=directory
-    become: yes
-    become_method: sudo
-
-  - name:  Install wsgi
-    copy: src=ckanpackager.wsgi dest=/etc/ckan/ckanpackager.wsgi
-    become: yes
-    become_method: sudo
-
   - name:  Install DWC-A extensions
     copy: src=gbif_dwca_extensions dest=/etc/ckanpackager/  
     become: yes
-    become_method: sudo    
+    become_method: sudo
 
   - name: Create database directory
     file: path=/var/lib/ckanpackager state=directory owner=www-data group=www-data mode=0755

@@ -1,3 +1,5 @@
 ---
-  - include: apache2.yml
-  - include: supervisor.yml
+- name: restart supervisor
+  service: name=supervisor state=restarted
+  become: yes
+  become_method: sudo

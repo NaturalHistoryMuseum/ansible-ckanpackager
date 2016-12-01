@@ -21,6 +21,12 @@ The Data Portal Bot
 """
 SMTP_HOST = '{{ckanpackager_smtp_host}}'
 SMTP_PORT = {{ckanpackager_smtp_port}}
+{% if ckanpackager_smtp_login is defined %}
+SMTP_LOGIN = '{{ckanpackager_smtp_login}}'
+{% endif %}
+{% if ckanpackager_smtp_password is defined %}
+SMTP_PASSWORD = '{{ckanpackager_smtp_password}}'
+{% endif %}
 DWC_ID_FIELD = '_id'
 DWC_CORE_EXTENSION = '/etc/ckanpackager/gbif_dwca_extensions/core/dwc_occurrence.xml'
 DWC_DYNAMIC_TERM = 'dynamicProperties'
