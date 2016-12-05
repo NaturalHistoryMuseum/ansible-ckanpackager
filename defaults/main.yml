@@ -4,7 +4,7 @@
   ckanpackager_port: 8765
   ckanpackager_user: "admin"
   ckanpackager_smtp_host: "mailtrap.io"  
-  ckanpackager_smtp_port: "25"    
+  ckanpackager_smtp_port: 2525   
   ckanpackager_email_from: "no-reply@{ckan_host}"
   ckanpackager_email_subject: "Resource from {ckan_host}"
   ckanpackager_debug: True
