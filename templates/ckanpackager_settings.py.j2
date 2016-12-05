@@ -15,7 +15,7 @@ EMAIL_SUBJECT = "{{ckanpackager_email_subject}}"
 EMAIL_FROM = "{{ckanpackager_email_from}}"
 EMAIL_BODY = """Hello,
 The link to the resource you requested on {ckan_host} is available at:
-http://{SERVER_NAME}/resources/{zip_file_name}
+http://{ckan_host}/resources/{zip_file_name}
 Best Wishes,
 The Data Portal Bot
 """
@@ -43,3 +43,6 @@ DWC_EXTENSION_FIELDS = {
         }
     }
 }
+{% if sentry_dsn is defined %}
+SENTRY_DSN = '{{sentry_dsn}}'
+{% endif %}
