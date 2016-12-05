@@ -32,6 +32,7 @@
       - python-dev
       - python-pip 
       - python-virtualenv      
+      - zip
 
   - name: Install ckanpackager
     pip: name='git+https://github.com/NaturalHistoryMuseum/ckanpackager.git#egg=ckanpackager' virtualenv={{ckanpackager_dir}}
